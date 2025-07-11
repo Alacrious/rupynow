@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "215442487576",
+    "project_id": "rupynow",
+    "storage_bucket": "rupynow.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215442487576:android:38af72bb4487430a53c66d",
+        "android_client_info": {
+          "package_name": "com.rupynow.application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCugw3I20_0EEY4WcMTpBuPMPFcUUgxebY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

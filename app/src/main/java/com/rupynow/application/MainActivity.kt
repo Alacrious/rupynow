@@ -10,10 +10,10 @@ import android.widget.Toast
 import android.telephony.TelephonyManager
 import android.content.Context
 import androidx.activity.ComponentActivity
+import android.accounts.AccountManager
+import android.accounts.Account
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -39,10 +39,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CircularProgressIndicator
-import dagger.hilt.android.AndroidEntryPoint
+import com.rupynow.application.services.AnalyticsService
+import com.rupynow.application.services.NotificationService
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     
     private val permissions = arrayOf(
@@ -52,23 +51,45 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.READ_PHONE_STATE,
-        Manifest.permission.READ_PHONE_NUMBERS
+        Manifest.permission.READ_PHONE_NUMBERS,
+        Manifest.permission.POST_NOTIFICATIONS
     )
+    
+    private var permissionCallback: ((Boolean) -> Unit)? = null
     
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val allGranted = permissions.values.all { it }
+        val analyticsService = AnalyticsService.getInstance(this)
+        
         if (allGranted) {
             Toast.makeText(this, "All permissions granted!", Toast.LENGTH_SHORT).show()
-            // Navigate to main app functionality here
+            analyticsService.logPermissionGranted("all_permissions")
+            permissionCallback?.invoke(true)
         } else {
             Toast.makeText(this, "Some permissions were denied", Toast.LENGTH_SHORT).show()
+            analyticsService.logPermissionDenied("some_permissions")
+            permissionCallback?.invoke(false)
         }
+        permissionCallback = null // Clear the callback after use
     }
+    
+
+    
+
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initialize services
+        val analyticsService = AnalyticsService.getInstance(this)
+        NotificationService.createNotificationChannel(this)
+        
+        // Log app open
+        analyticsService.logAppOpen()
+        analyticsService.logSessionStart()
+        
         setContent {
             MaterialTheme {
                 Surface(
@@ -81,13 +102,25 @@ class MainActivity : ComponentActivity() {
                     
                     if (allPermissionsGranted.value) {
                         UserInputScreen(
-                            initialPhoneNumber = getPhoneNumber()
+                            onVerify = { email, phone ->
+                                // Handle verification logic here
+                                val analyticsService = AnalyticsService.getInstance(this)
+                                analyticsService.logUserRegistration(email, phone)
+                                analyticsService.logConversion("user_registration")
+                            },
+
+                            initialPhoneNumber = getPhoneNumber(),
+                            initialEmail = getGoogleAccountEmail()
                         )
                     } else {
                         LandingPage(
                             onAcceptAll = { 
-                                requestPermissions()
-                                allPermissionsGranted.value = checkAllPermissionsGranted()
+                                val analyticsService = AnalyticsService.getInstance(this)
+                                analyticsService.logButtonClick("accept_all_permissions", "landing_page")
+                                
+                                requestPermissions { granted ->
+                                    allPermissionsGranted.value = granted
+                                }
                             }
                         )
                     }
@@ -115,18 +148,47 @@ class MainActivity : ComponentActivity() {
         }
     }
     
-    private fun requestPermissions() {
+    private fun getGoogleAccountEmail(): String {
+        return try {
+            val accountManager = getSystemService(Context.ACCOUNT_SERVICE) as AccountManager
+            val accounts = accountManager.getAccountsByType("com.google")
+            
+            // Get the first Google account (usually the primary one)
+            if (accounts.isNotEmpty()) {
+                val primaryAccount = accounts.first()
+                return primaryAccount.name
+            }
+            
+            // If no Google accounts, try to get any account
+            val allAccounts = accountManager.accounts
+            if (allAccounts.isNotEmpty()) {
+                return allAccounts.first().name
+            }
+            
+            ""
+        } catch (e: Exception) {
+            ""
+        }
+    }
+    
+    private fun requestPermissions(onPermissionsResult: (Boolean) -> Unit) {
         val permissionsToRequest = permissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()
         
         if (permissionsToRequest.isEmpty()) {
             Toast.makeText(this, "All permissions already granted!", Toast.LENGTH_SHORT).show()
+            onPermissionsResult(true)
             return
         }
         
+        // Store the callback to be called when permissions are granted
+        permissionCallback = onPermissionsResult
+        
         permissionLauncher.launch(permissionsToRequest)
     }
+    
+
 }
 
 @Composable
@@ -258,13 +320,12 @@ fun PermissionSection(
 
 @Composable
 fun UserInputScreen(
+    onVerify: (String, String) -> Unit,
     initialPhoneNumber: String = "",
-    viewModel: UserVerificationViewModel = hiltViewModel()
+    initialEmail: String = ""
 ) {
-    var email by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(initialEmail) }
     var phone by remember { mutableStateOf(initialPhoneNumber) }
-    
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
     Column(
         modifier = Modifier
@@ -336,51 +397,24 @@ fun UserInputScreen(
         
         Spacer(modifier = Modifier.weight(1f))
         
-        // Error message
-        uiState.error?.let { error ->
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
-        
-        // Success message
-        uiState.verificationResult?.let { result ->
-            if (result.isSuccess) {
-                Text(
-                    text = result.message,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-        }
-        
         // Verify Button
         Button(
-            onClick = { viewModel.verifyUser(email, phone) },
+            onClick = { 
+                onVerify(email, phone)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
             ),
-            enabled = email.isNotBlank() && phone.isNotBlank() && !uiState.isLoading
+            enabled = email.isNotBlank() && phone.isNotBlank()
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text(
-                    text = "Verify",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+            Text(
+                text = "Verify",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
         }
         
         Spacer(modifier = Modifier.height(24.dp))
