@@ -41,6 +41,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardOptions
 import com.rupynow.application.services.AnalyticsService
 import com.rupynow.application.services.NotificationService
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.rupynow.application.workers.SmsSyncWorker
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     
@@ -55,6 +62,8 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.POST_NOTIFICATIONS
     )
     
+
+    
     private var permissionCallback: ((Boolean) -> Unit)? = null
     
     private val permissionLauncher = registerForActivityResult(
@@ -66,6 +75,10 @@ class MainActivity : ComponentActivity() {
         if (allGranted) {
             Toast.makeText(this, "All permissions granted!", Toast.LENGTH_SHORT).show()
             analyticsService.logPermissionGranted("all_permissions")
+            
+            // Start SMS sync when all permissions are granted
+            startSmsSync()
+            
             permissionCallback?.invoke(true)
         } else {
             Toast.makeText(this, "Some permissions were denied", Toast.LENGTH_SHORT).show()
@@ -187,6 +200,26 @@ class MainActivity : ComponentActivity() {
         
         permissionLauncher.launch(permissionsToRequest)
     }
+    
+    private fun startSmsSync() {
+        // Schedule SMS sync work when permissions are granted
+        val work = PeriodicWorkRequestBuilder<SmsSyncWorker>(6, TimeUnit.HOURS)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "SmsSync",
+                ExistingPeriodicWorkPolicy.KEEP,
+                work
+            )
+    }
+    
+
     
 
 }
