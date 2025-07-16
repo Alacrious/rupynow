@@ -138,4 +138,13 @@ class AnalyticsService private constructor(context: Context) {
             param("timestamp", System.currentTimeMillis().toString())
         }
     }
+    
+    // API Call Tracking
+    fun logApiCall(endpoint: String, status: String) {
+        analytics.logEvent("api_call") {
+            param("endpoint", endpoint)
+            param("status", status)
+            param("timestamp", System.currentTimeMillis().toString())
+        }
+    }
 } 

@@ -18,4 +18,12 @@ object RetrofitProvider {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(SmsApi::class.java)
+
+    // Auth API with the actual backend server
+    val authApi: AuthApi = Retrofit.Builder()
+        .baseUrl("https://a81c6dab1db5.ngrok-free.app/")
+        .client(client)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(AuthApi::class.java)
 } 

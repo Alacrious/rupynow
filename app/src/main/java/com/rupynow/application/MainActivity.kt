@@ -48,6 +48,13 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.rupynow.application.workers.SmsSyncWorker
 import java.util.concurrent.TimeUnit
+import com.rupynow.application.network.RetrofitProvider
+import com.rupynow.application.data.OtpGenerateRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import android.util.Log
 
 class MainActivity : ComponentActivity() {
     
@@ -123,7 +130,8 @@ class MainActivity : ComponentActivity() {
                             },
 
                             initialPhoneNumber = getPhoneNumber(),
-                            initialEmail = getGoogleAccountEmail()
+                            initialEmail = getGoogleAccountEmail(),
+                            context = this
                         )
                     } else {
                         LandingPage(
@@ -217,6 +225,79 @@ class MainActivity : ComponentActivity() {
                 ExistingPeriodicWorkPolicy.KEEP,
                 work
             )
+    }
+    
+    fun generateOtp(email: String, phone: String, onComplete: (Boolean) -> Unit = {}) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val request = OtpGenerateRequest(
+                    mobileNumber = phone,
+                    email = email
+                )
+                
+                val response = RetrofitProvider.authApi.generateOtp(
+                    authorization = "Basic YWRtaW46YWRtaW4=",
+                    request = request
+                )
+                
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val otpResponse = response.body()
+                        if (otpResponse?.status == "OK") {
+                            
+                            // Log successful API call
+                            val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                            analyticsService.logApiCall("otp_generate", "success")
+                            onComplete(true)
+                        } else {
+                            val errorMessage = "Error: ${otpResponse?.message ?: "Unknown error"}"
+                            Toast.makeText(
+                                this@MainActivity,
+                                errorMessage,
+                                Toast.LENGTH_LONG
+                            ).show()
+                            
+                            Log.e("MainActivity", errorMessage)
+                            
+                            // Log failed API call
+                            val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                            analyticsService.logApiCall("otp_generate", "failed")
+                            onComplete(false)
+                        }
+                    } else {
+                        val networkErrorMessage = "Network error: ${response.code()}"
+                        Toast.makeText(
+                            this@MainActivity,
+                            networkErrorMessage,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        
+                        Log.e("MainActivity", networkErrorMessage)
+                        
+                        // Log network error
+                        val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                        analyticsService.logApiCall("otp_generate", "network_error")
+                        onComplete(false)
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    val exceptionMessage = "Error: ${e.message}"
+                    Toast.makeText(
+                        this@MainActivity,
+                        exceptionMessage,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    Log.e("MainActivity", exceptionMessage, e)
+                    
+                    // Log exception
+                    val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                    analyticsService.logApiCall("otp_generate", "exception")
+                    onComplete(false)
+                }
+            }
+        }
     }
     
 
@@ -355,10 +436,12 @@ fun PermissionSection(
 fun UserInputScreen(
     onVerify: (String, String) -> Unit,
     initialPhoneNumber: String = "",
-    initialEmail: String = ""
+    initialEmail: String = "",
+    context: MainActivity
 ) {
     var email by remember { mutableStateOf(initialEmail) }
     var phone by remember { mutableStateOf(initialPhoneNumber) }
+    var isLoading by remember { mutableStateOf(false) }
     
     Column(
         modifier = Modifier
@@ -433,7 +516,13 @@ fun UserInputScreen(
         // Verify Button
         Button(
             onClick = { 
+                isLoading = true
                 onVerify(email, phone)
+                
+                // Make API call to generate OTP
+                context.generateOtp(email, phone) { success ->
+                    isLoading = false
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -441,13 +530,20 @@ fun UserInputScreen(
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
             ),
-            enabled = email.isNotBlank() && phone.isNotBlank()
+            enabled = email.isNotBlank() && phone.isNotBlank() && !isLoading
         ) {
-            Text(
-                text = "Verify",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text(
+                    text = "Verify",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
         
         Spacer(modifier = Modifier.height(24.dp))
