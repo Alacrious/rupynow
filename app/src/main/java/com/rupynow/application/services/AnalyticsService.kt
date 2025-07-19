@@ -147,4 +147,21 @@ class AnalyticsService private constructor(context: Context) {
             param("timestamp", System.currentTimeMillis().toString())
         }
     }
+    
+    // OTP Detection Tracking
+    fun logOtpDetected(otp: String, sender: String) {
+        analytics.logEvent("otp_detected") {
+            param("otp_length", otp.length.toLong())
+            param("sender", sender)
+            param("timestamp", System.currentTimeMillis().toString())
+        }
+    }
+    
+    fun logOtpAutoFill(otp: String, screenName: String) {
+        analytics.logEvent("otp_auto_fill") {
+            param("otp_length", otp.length.toLong())
+            param("screen_name", screenName)
+            param("timestamp", System.currentTimeMillis().toString())
+        }
+    }
 } 

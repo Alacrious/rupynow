@@ -12,6 +12,7 @@ import android.content.Context
 import androidx.activity.ComponentActivity
 import android.accounts.AccountManager
 import android.accounts.Account
+import android.app.Activity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,6 +57,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.util.Log
+import com.rupynow.application.data.UserPreferences
+import com.rupynow.application.ui.OtpInputScreen
+
 
 class MainActivity : ComponentActivity() {
     
@@ -72,6 +77,8 @@ class MainActivity : ComponentActivity() {
 
     
     private var permissionCallback: ((Boolean) -> Unit)? = null
+    
+
     
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -102,6 +109,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+
+        
         // Initialize services
         val analyticsService = AnalyticsService.getInstance(this)
         NotificationService.createNotificationChannel(this)
@@ -120,19 +129,93 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf(checkAllPermissionsGranted())
                     }
                     
-                    if (allPermissionsGranted.value) {
-                        UserInputScreen(
-                            onVerify = { email, phone ->
-                                // Handle verification logic here
-                                val analyticsService = AnalyticsService.getInstance(this)
-                                analyticsService.logUserRegistration(email, phone)
-                                analyticsService.logConversion("user_registration")
-                            },
-
-                            initialPhoneNumber = getPhoneNumber(),
-                            initialEmail = getGoogleAccountEmail(),
-                            context = this
-                        )
+                                        if (allPermissionsGranted.value) {
+                        val currentScreen = remember { mutableStateOf("user_input") }
+                        val userEmail = remember { mutableStateOf("") }
+                        val userPhone = remember { mutableStateOf("") }
+                        
+                        when (currentScreen.value) {
+                            "user_input" -> {
+                                UserInputScreen(
+                                    onVerify = { email, phone ->
+                                        // Handle verification logic here
+                                        val analyticsService = AnalyticsService.getInstance(this)
+                                        analyticsService.logUserRegistration(email, phone)
+                                        analyticsService.logConversion("user_registration")
+                                        
+                                                                        // Save to DataStore
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    try {
+                                        val userPreferences = UserPreferences(this@MainActivity)
+                                        userPreferences.saveUserInfo(phone, email)
+                                    } catch (e: Exception) {
+                                        Log.e("MainActivity", "Error saving user data: ${e.message}")
+                                    }
+                                }
+                                        
+                                        // Store user data and navigate to OTP screen
+                                        userEmail.value = email
+                                        userPhone.value = phone
+                                        currentScreen.value = "otp_input"
+                                    },
+                                    initialPhoneNumber = getPhoneNumber(),
+                                    initialEmail = getGoogleAccountEmail(),
+                                    context = this
+                                )
+                            }
+                            "otp_input" -> {
+                                OtpInputScreen(
+                                    onOtpVerified = { otp ->
+                                        // Handle OTP verification
+                                        val analyticsService = AnalyticsService.getInstance(this)
+                                        analyticsService.logConversion("otp_verification_success")
+                                        
+                                        // Navigate to success screen or main app
+                                        currentScreen.value = "success"
+                                    },
+                                    onBackPressed = {
+                                        currentScreen.value = "user_input"
+                                    },
+                                    context = this,
+                                    phoneNumber = userPhone.value
+                                )
+                            }
+                            "success" -> {
+                                // Success screen
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.CheckCircle,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(80.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                    
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    
+                                    Text(
+                                        text = "Verification Successful!",
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    
+                                    Text(
+                                        text = "Welcome to RupyNow",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        textAlign = TextAlign.Center,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                     } else {
                         LandingPage(
                             onAcceptAll = { 

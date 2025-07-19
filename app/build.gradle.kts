@@ -74,6 +74,13 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     
+    // DataStore for data persistence
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    
+    // Google Play Services for SMS Retriever API
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.android.gms:play-services-auth-api-phone:18.0.1")
+    
     // Debug dependencies
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
