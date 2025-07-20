@@ -52,10 +52,13 @@ import com.rupynow.application.workers.SmsSyncWorker
 import java.util.concurrent.TimeUnit
 import com.rupynow.application.network.RetrofitProvider
 import com.rupynow.application.data.OtpGenerateRequest
+import com.rupynow.application.data.OtpVerifyRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.flow.first
 import android.util.Log
 import com.rupynow.application.data.UserPreferences
 import com.rupynow.application.ui.OtpInputScreen
@@ -109,7 +112,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-
+        // Initialize device_id if not available
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val userPreferences = UserPreferences(this@MainActivity)
+                val deviceId = userPreferences.getOrCreateDeviceId()
+                Log.d("MainActivity", "Device ID: $deviceId")
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error initializing device_id: ${e.message}")
+            }
+        }
         
         // Initialize services
         val analyticsService = AnalyticsService.getInstance(this)
@@ -133,9 +145,11 @@ class MainActivity : ComponentActivity() {
                         val currentScreen = remember { mutableStateOf("user_input") }
                         val userEmail = remember { mutableStateOf("") }
                         val userPhone = remember { mutableStateOf("") }
+                        val resetLoadingCallback = remember { mutableStateOf<(() -> Unit)?>(null) }
                         
                         when (currentScreen.value) {
                             "user_input" -> {
+                                // Reset any previous error states when returning to user input
                                 UserInputScreen(
                                     onVerify = { email, phone ->
                                         // Handle verification logic here
@@ -143,35 +157,59 @@ class MainActivity : ComponentActivity() {
                                         analyticsService.logUserRegistration(email, phone)
                                         analyticsService.logConversion("user_registration")
                                         
-                                                                        // Save to DataStore
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    try {
-                                        val userPreferences = UserPreferences(this@MainActivity)
-                                        userPreferences.saveUserInfo(phone, email)
-                                    } catch (e: Exception) {
-                                        Log.e("MainActivity", "Error saving user data: ${e.message}")
-                                    }
-                                }
+                                        // Save to DataStore
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            try {
+                                                val userPreferences = UserPreferences(this@MainActivity)
+                                                userPreferences.saveUserInfo(phone, email)
+                                            } catch (e: Exception) {
+                                                Log.e("MainActivity", "Error saving user data: ${e.message}")
+                                            }
+                                        }
                                         
-                                        // Store user data and navigate to OTP screen
+                                        // Store user data
                                         userEmail.value = email
                                         userPhone.value = phone
-                                        currentScreen.value = "otp_input"
+                                        
+                                        // Generate OTP and only navigate if successful
+                                        generateOtp(
+                                            email = email, 
+                                            phone = phone,
+                                            onComplete = { success ->
+                                                if (success) {
+                                                    currentScreen.value = "otp_input"
+                                                }
+                                            },
+                                            onError = {
+                                                // Reset loading state on any error
+                                                resetLoadingCallback.value?.invoke()
+                                            }
+                                        )
                                     },
                                     initialPhoneNumber = getPhoneNumber(),
                                     initialEmail = getGoogleAccountEmail(),
-                                    context = this
+                                    context = this,
+                                    onLoadingStateChange = { isLoading ->
+                                        // This callback will be used to reset loading state on errors
+                                    },
+                                    onResetLoading = { resetCallback ->
+                                        resetLoadingCallback.value = resetCallback
+                                    }
                                 )
                             }
                             "otp_input" -> {
                                 OtpInputScreen(
-                                    onOtpVerified = { otp ->
-                                        // Handle OTP verification
-                                        val analyticsService = AnalyticsService.getInstance(this)
-                                        analyticsService.logConversion("otp_verification_success")
-                                        
-                                        // Navigate to success screen or main app
-                                        currentScreen.value = "success"
+                                    onOtpVerified = { otp, onResult ->
+                                        // Handle OTP verification with the new API
+                                        verifyOtpWithApi(otp) { success ->
+                                            if (success) {
+                                                val analyticsService = AnalyticsService.getInstance(this)
+                                                analyticsService.logConversion("otp_verification_success")
+                                                currentScreen.value = "success"
+                                            }
+                                            // Pass result back to the screen
+                                            onResult(success)
+                                        }
                                     },
                                     onBackPressed = {
                                         currentScreen.value = "user_input"
@@ -310,30 +348,57 @@ class MainActivity : ComponentActivity() {
             )
     }
     
-    fun generateOtp(email: String, phone: String, onComplete: (Boolean) -> Unit = {}) {
+    fun verifyOtpWithApi(otpCode: String, onComplete: (Boolean) -> Unit = {}) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val request = OtpGenerateRequest(
-                    mobileNumber = phone,
-                    email = email
+                Log.d("MainActivity", "Starting OTP verification for code: $otpCode")
+                
+                // Get stored user data
+                val userPreferences = UserPreferences(this@MainActivity)
+                val mobileNumber = userPreferences.mobileNumber.first()
+                val userId = userPreferences.userId.first()
+                val deviceId = userPreferences.getOrCreateDeviceId()
+                
+                Log.d("MainActivity", "User data - Mobile: $mobileNumber, UserId: ${userId ?: "null (first install)"}, DeviceId: $deviceId")
+                
+                if (mobileNumber.isNullOrBlank()) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "User data not found. Please restart the app.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        onComplete(false)
+                    }
+                    return@launch
+                }
+                
+                // userId can be null on first install, that's okay
+                val finalUserId = userId ?: ""
+                
+                val request = OtpVerifyRequest(
+                    mobileNumber = mobileNumber,
+                    userId = finalUserId,
+                    otpCode = otpCode,
+                    deviceId = deviceId
                 )
                 
-                val response = RetrofitProvider.authApi.generateOtp(
-                    authorization = "Basic YWRtaW46YWRtaW4=",
-                    request = request
-                )
+                Log.d("MainActivity", "🔥 FIRING OTP VERIFY API - Code: $otpCode")
+                Log.d("MainActivity", "🌐 API URL: https://daf01b84975c.ngrok-free.app/api/user/auth/otp/verify")
+                val response = RetrofitProvider.authApi.verifyOtp(request = request)
+                
+                Log.d("MainActivity", "API Response - Code: ${response.code()}, Success: ${response.isSuccessful}")
                 
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         val otpResponse = response.body()
                         if (otpResponse?.status == "OK") {
-                            
                             // Log successful API call
                             val analyticsService = AnalyticsService.getInstance(this@MainActivity)
-                            analyticsService.logApiCall("otp_generate", "success")
+                            analyticsService.logApiCall("otp_verify", "success")
                             onComplete(true)
                         } else {
-                            val errorMessage = "Error: ${otpResponse?.message ?: "Unknown error"}"
+                            val errorMessage = "Error: ${otpResponse?.message ?: "Verification failed"}"
                             Toast.makeText(
                                 this@MainActivity,
                                 errorMessage,
@@ -344,11 +409,11 @@ class MainActivity : ComponentActivity() {
                             
                             // Log failed API call
                             val analyticsService = AnalyticsService.getInstance(this@MainActivity)
-                            analyticsService.logApiCall("otp_generate", "failed")
+                            analyticsService.logApiCall("otp_verify", "failed")
                             onComplete(false)
                         }
                     } else {
-                        val networkErrorMessage = "Network error: ${response.code()}"
+                        val networkErrorMessage = "Network error: ${response.code()} message: ${response.message()}"
                         Toast.makeText(
                             this@MainActivity,
                             networkErrorMessage,
@@ -359,7 +424,7 @@ class MainActivity : ComponentActivity() {
                         
                         // Log network error
                         val analyticsService = AnalyticsService.getInstance(this@MainActivity)
-                        analyticsService.logApiCall("otp_generate", "network_error")
+                        analyticsService.logApiCall("otp_verify", "network_error")
                         onComplete(false)
                     }
                 }
@@ -376,8 +441,112 @@ class MainActivity : ComponentActivity() {
                     
                     // Log exception
                     val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                    analyticsService.logApiCall("otp_verify", "exception")
+                    onComplete(false)
+                }
+            }
+        }
+    }
+    
+    fun generateOtp(email: String, phone: String, onComplete: (Boolean) -> Unit = {}, onError: () -> Unit = {}) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Add timeout for API call (30 seconds)
+                withTimeout(30000L) {
+                    Log.d("MainActivity", "Starting OTP generation for email: $email, phone: $phone")
+                    
+                    // Get or create device_id
+                    val userPreferences = UserPreferences(this@MainActivity)
+                    val deviceId = userPreferences.getOrCreateDeviceId()
+                    
+                    val request = OtpGenerateRequest(
+                        mobileNumber = phone,
+                        email = email,
+                        deviceId = deviceId
+                    )
+                    
+                    Log.d("MainActivity", "🔥 FIRING OTP GENERATE API - Email: $email, Phone: $phone")
+                    Log.d("MainActivity", "🌐 API URL: https://daf01b84975c.ngrok-free.app/api/user/auth/otp/generate")
+                    val response = RetrofitProvider.authApi.generateOtp(
+                        authorization = "Basic YWRtaW46YWRtaW4=",
+                        request = request
+                    )
+                    
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            val otpResponse = response.body()
+                            if (otpResponse?.status == "OK") {
+                                
+                                // Save userId for OTP verification
+                                val userId = otpResponse.data?.userId
+                                if (userId != null) {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        try {
+                                            val userPreferences = UserPreferences(this@MainActivity)
+                                            userPreferences.saveUserId(userId)
+                                        } catch (e: Exception) {
+                                            Log.e("MainActivity", "Error saving userId: ${e.message}")
+                                        }
+                                    }
+                                }
+                                
+                                // Log successful API call
+                                val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                                analyticsService.logApiCall("otp_generate", "success")
+                                onComplete(true)
+                            } else {
+                                val errorMessage = "Error: ${otpResponse?.message ?: "Unknown error"}"
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    errorMessage,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                
+                                Log.e("MainActivity", errorMessage)
+                                
+                                // Log failed API call
+                                val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                                analyticsService.logApiCall("otp_generate", "failed")
+                                onComplete(false)
+                                onError()
+                            }
+                        } else {
+                            val networkErrorMessage = "Network error: ${response.code()}, message: ${response.message()}"
+                            Toast.makeText(
+                                this@MainActivity,
+                                networkErrorMessage,
+                                Toast.LENGTH_LONG
+                            ).show()
+                            
+                            Log.e("MainActivity", networkErrorMessage)
+                            
+                            // Log network error
+                            val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                            analyticsService.logApiCall("otp_generate", "network_error")
+                            onComplete(false)
+                            onError()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    val exceptionMessage = when (e) {
+                        is kotlinx.coroutines.TimeoutCancellationException -> "Request timed out. Please try again."
+                        else -> "Error: ${e.message}"
+                    }
+                    Toast.makeText(
+                        this@MainActivity,
+                        exceptionMessage,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    Log.e("MainActivity", exceptionMessage, e)
+                    
+                    // Log exception
+                    val analyticsService = AnalyticsService.getInstance(this@MainActivity)
                     analyticsService.logApiCall("otp_generate", "exception")
                     onComplete(false)
+                    onError()
                 }
             }
         }
@@ -520,11 +689,45 @@ fun UserInputScreen(
     onVerify: (String, String) -> Unit,
     initialPhoneNumber: String = "",
     initialEmail: String = "",
-    context: MainActivity
+    context: MainActivity,
+    onLoadingStateChange: (Boolean) -> Unit = {},
+    onResetLoading: (() -> Unit) -> Unit = {}
 ) {
     var email by remember { mutableStateOf(initialEmail) }
     var phone by remember { mutableStateOf(initialPhoneNumber) }
     var isLoading by remember { mutableStateOf(false) }
+    
+    // Add loading state reset callback
+    val resetLoading = { 
+        isLoading = false
+        onLoadingStateChange(false)
+    }
+    
+    // Pass the reset callback to parent
+    LaunchedEffect(Unit) {
+        onResetLoading(resetLoading)
+    }
+    
+    // Handle loading state from OTP generation
+    LaunchedEffect(Unit) {
+        // Reset loading state when screen is shown
+        isLoading = false
+    }
+    
+    // Reset loading state when user interacts with inputs (indicating they want to retry)
+    LaunchedEffect(email, phone) {
+        if (isLoading) {
+            // If user is typing while loading, they might want to retry
+            // This will be handled by the button click logic
+        }
+    }
+    
+    // Reset loading state when screen is recomposed (after error)
+    LaunchedEffect(Unit) {
+        // This will reset loading state when screen is recomposed
+        // which happens after an error in OTP generation
+        isLoading = false
+    }
     
     Column(
         modifier = Modifier
@@ -599,12 +802,9 @@ fun UserInputScreen(
         // Verify Button
         Button(
             onClick = { 
-                isLoading = true
-                onVerify(email, phone)
-                
-                // Make API call to generate OTP
-                context.generateOtp(email, phone) { success ->
-                    isLoading = false
+                if (email.isNotBlank() && phone.isNotBlank()) {
+                    isLoading = true
+                    onVerify(email, phone)
                 }
             },
             modifier = Modifier

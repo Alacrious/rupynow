@@ -23,7 +23,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun OtpInputScreen(
-    onOtpVerified: (String) -> Unit,
+    onOtpVerified: (String, (Boolean) -> Unit) -> Unit,
     onBackPressed: () -> Unit,
     context: android.content.Context,
     phoneNumber: String = ""
@@ -32,6 +32,7 @@ fun OtpInputScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var showAutoFillButton by remember { mutableStateOf(false) }
+    var verificationResult by remember { mutableStateOf<Boolean?>(null) }
     
     // Get OTP detection service (SMS Retriever API only)
     val smsRetrieverService = remember { SmsRetrieverService.getInstance() }
@@ -73,12 +74,25 @@ fun OtpInputScreen(
         }
     }
     
-    // Handle verification delay
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            delay(1500) // Simulate API call
+    // Handle verification when OTP is complete
+    LaunchedEffect(otp) {
+        if (otp.length == 6 && !isLoading) {
+            isLoading = true
+            errorMessage = ""
+            verificationResult = null
+            onOtpVerified(otp) { success ->
+                verificationResult = success
+            }
+        }
+    }
+    
+    // Handle verification result
+    LaunchedEffect(verificationResult) {
+        verificationResult?.let { success ->
             isLoading = false
-            onOtpVerified(otp)
+            if (!success) {
+                errorMessage = "Invalid verification code. Please try again."
+            }
         }
     }
     
@@ -197,51 +211,71 @@ fun OtpInputScreen(
         }
         
         // OTP Input Field
-        OutlinedTextField(
+        OtpInputWithAutofill(
             value = otp,
-            onValueChange = { 
+            onValueChange = { newValue ->
                 // Only allow digits and limit to 6 characters
-                val filtered = it.filter { char -> char.isDigit() }
+                val filtered = newValue.filter { char -> char.isDigit() }
                 if (filtered.length <= 6) {
                     otp = filtered
                     errorMessage = "" // Clear error when user types
                 }
             },
-            label = { Text("Enter 6-digit code") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Lock,
-                    contentDescription = "OTP"
-                )
-            },
-            trailingIcon = {
-                if (otp.isNotEmpty()) {
-                    IconButton(
-                        onClick = { otp = "" }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Clear,
-                            contentDescription = "Clear"
-                        )
+            onOtpComplete = { completedOtp ->
+                if (completedOtp.length == 6) {
+                    otp = completedOtp
+                    showAutoFillButton = false
+                    
+                    // Log auto-fill event
+                    val analyticsService = AnalyticsService.getInstance(context)
+                    analyticsService.logOtpAutoFill(completedOtp, "otp_input_screen")
+                    
+                    // Clear the detected OTP
+                    smsRetrieverService.clearDetectedOtp()
+                    
+                    // Auto-verify if OTP is complete
+                    if (!isLoading) {
+                        isLoading = true
+                        errorMessage = ""
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            singleLine = true,
             isError = errorMessage.isNotEmpty(),
-            supportingText = {
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
+            enabled = !isLoading
         )
+        
+        // Loading indicator and message
+        if (isLoading) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(32.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "Verifying OTP...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        
+        // Error message display
+        if (errorMessage.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         
         Spacer(modifier = Modifier.height(24.dp))
         
