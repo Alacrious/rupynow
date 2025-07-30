@@ -11,10 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -104,101 +106,45 @@ fun BasicDetailsScreen(
         Spacer(modifier = Modifier.height(32.dp))
         
         // Full Name Input
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Full Name",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = fullName,
-                onValueChange = { fullName = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text("Enter your full name")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                )
-            )
-        }
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = { fullName = it },
+            label = { Text("Full Name") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            singleLine = true
+        )
         
         Spacer(modifier = Modifier.height(24.dp))
         
         // PAN Number Input
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "PAN Number",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = panNumber,
-                onValueChange = { 
-                    // Convert to uppercase and allow only alphanumeric characters
-                    val filtered = it.uppercase().filter { char -> 
-                        char.isLetterOrDigit() 
-                    }
-                    if (filtered.length <= 10) {
-                        panNumber = filtered
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text("Enter your PAN number")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                )
-            )
-        }
+        OutlinedTextField(
+            value = panNumber,
+            onValueChange = { panNumber = it.uppercase() },
+            label = { Text("PAN Number") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            singleLine = true
+        )
         
         Spacer(modifier = Modifier.weight(1f))
         
-        // Submit Button (updated CTA)
+        // Submit Button
         Button(
             onClick = {
-                if (fullName.isBlank()) {
-                    return@Button
-                }
-                
-                isLoading = true
-                
-                // Log analytics
-                val analyticsService = AnalyticsService.getInstance(context)
-                analyticsService.logButtonClick("submit_details", "basic_details_screen")
-                analyticsService.logFeatureUsage("loan_application", "details_submitted")
-                
-                onSubmitDetails(fullName, panNumber) { success ->
-                    isLoading = false
-                    if (!success) {
-                        // Handle error - could show a toast or error message
-                        // For now, we'll just log the failure
-                        analyticsService.logError("details_submission_failed", "Details submission failed")
+                if (fullName.isNotBlank() && panNumber.isNotBlank()) {
+                    isLoading = true
+                    onSubmitDetails(fullName, panNumber) { success ->
+                        isLoading = false
+                        if (!success) {
+                            // Handle error if needed
+                        }
                     }
                 }
             },
@@ -208,7 +154,7 @@ fun BasicDetailsScreen(
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
             ),
-            enabled = fullName.isNotBlank() && !isLoading
+            enabled = fullName.isNotBlank() && panNumber.isNotBlank() && !isLoading
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
@@ -219,19 +165,35 @@ fun BasicDetailsScreen(
                 Text(
                     text = "Submit",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
-// Extension function to capitalize first letter of each word
-private fun String.capitalize(): String {
-    return this.split(" ").joinToString(" ") { word ->
-        word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+// Preview for BasicDetailsScreen - Empty state
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun BasicDetailsScreenPreview() {
+    MaterialTheme {
+        BasicDetailsScreen(
+            onSubmitDetails = { _, _, _ -> /* Preview only */ },
+            context = LocalContext.current
+        )
+    }
+}
+
+// Preview for BasicDetailsScreen - Filled state
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, name = "BasicDetailsScreen - Filled")
+@Composable
+fun BasicDetailsScreenFilledPreview() {
+    MaterialTheme {
+        BasicDetailsScreen(
+            onSubmitDetails = { _, _, _ -> /* Preview only */ },
+            context = LocalContext.current
+        )
     }
 }

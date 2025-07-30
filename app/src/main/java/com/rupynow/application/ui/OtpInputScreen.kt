@@ -20,6 +20,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rupynow.application.services.SmsRetrieverService
 import com.rupynow.application.services.AnalyticsService
 import kotlinx.coroutines.delay
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun OtpInputScreen(
@@ -364,5 +366,39 @@ fun OtpInputScreen(
         }
         
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+// Preview for OtpInputScreen
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun OtpInputScreenPreview() {
+    MaterialTheme {
+        OtpInputScreen(
+            onOtpVerified = { otp, onResult ->
+                // Simulate OTP verification
+                onResult(true)
+            },
+            onBackPressed = { /* Preview only */ },
+            context = LocalContext.current,
+            phoneNumber = "+91 98765 43210"
+        )
+    }
+}
+
+// Preview for OtpInputScreen with error state
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, name = "OtpInputScreen - Error State")
+@Composable
+fun OtpInputScreenErrorPreview() {
+    MaterialTheme {
+        OtpInputScreen(
+            onOtpVerified = { otp, onResult ->
+                // Simulate failed OTP verification
+                onResult(false)
+            },
+            onBackPressed = { /* Preview only */ },
+            context = LocalContext.current,
+            phoneNumber = "+91 98765 43210"
+        )
     }
 } 

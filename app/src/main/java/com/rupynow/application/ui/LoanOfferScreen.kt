@@ -10,8 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rupynow.application.services.AnalyticsService
@@ -98,63 +100,123 @@ fun LoanOfferScreen(
                 Slider(
                     value = loanAmount,
                     onValueChange = { loanAmount = it },
-                    valueRange = 12000f..50000f,
-                    steps = 37, // (50000 - 12000) / 1000 - 1
+                    valueRange = 5000f..50000f,
+                    steps = 9,
                     modifier = Modifier.fillMaxWidth()
                 )
                 
-                // Min and Max values
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Amount Display
+                Text(
+                    text = "₹${loanAmount.toInt()}",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "Loan amount",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
+        // Loan Details Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Text(
+                    text = "Loan details",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Interest Rate
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "₹12,000",
+                        text = "Interest rate",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "₹50,000",
+                        text = "1.5% per month",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 
-                // Selected amount
-                Text(
-                    text = "₹${String.format("%,.0f", loanAmount)}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Loan Parameters
-                LoanParameterRow("Number of months", "12")
-                LoanParameterRow("Interest", "16%")
-                LoanParameterRow("Processing fee", "2.5%")
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Estimated EMI
+                // Processing Fee
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Estimated EMI:",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Processing fee",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "₹${calculateEMI(loanAmount)}/month",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        text = "₹299",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Tenure
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Tenure",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "3 months",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // EMI
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "EMI",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "₹${(loanAmount * 0.4).toInt()}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }
@@ -162,80 +224,41 @@ fun LoanOfferScreen(
         
         Spacer(modifier = Modifier.weight(1f))
         
-        // Continue to Apply Button
+        // Continue Button
         Button(
             onClick = {
                 scope.launch {
                     val analyticsService = AnalyticsService.getInstance(context)
                     analyticsService.logButtonClick("continue_to_apply", "loan_offer_screen")
-                    analyticsService.logFeatureUsage("loan_application", "started")
+                    onContinueToApply()
                 }
-                onContinueToApply()
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF424242) // Dark grey color
+                containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
             Text(
                 text = "Continue to Apply",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White
+                fontWeight = FontWeight.SemiBold
             )
         }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Disclaimer
-        Text(
-            text = "Subject to final KYC verification",
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
         
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
+// Preview for LoanOfferScreen
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
-private fun LoanParameterRow(
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold
+fun LoanOfferScreenPreview() {
+    MaterialTheme {
+        LoanOfferScreen(
+            onContinueToApply = { /* Preview only */ },
+            context = LocalContext.current
         )
     }
-}
-
-private fun calculateEMI(loanAmount: Float): String {
-    // Simple EMI calculation: P * r * (1 + r)^n / ((1 + r)^n - 1)
-    // Where P = principal, r = monthly interest rate, n = number of months
-    val principal = loanAmount
-    val annualRate = 0.16 // 16%
-    val monthlyRate = annualRate / 12
-    val months = 12
-    
-    val emi = principal * monthlyRate * Math.pow(1 + monthlyRate, months.toDouble()) / 
-               (Math.pow(1 + monthlyRate, months.toDouble()) - 1)
-    
-    return String.format("%,.0f", emi)
 } 

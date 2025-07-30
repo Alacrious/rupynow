@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Production-grade OTP input component with six separate boxes
@@ -294,4 +295,153 @@ fun OtpInputWithSmsRetriever(
         enabled = enabled,
         autofillHints = "sms_otp"
     )
+}
+
+// Preview for OtpInputField
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun OtpInputFieldPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "OTP Input Field",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            OtpInputField(
+                value = "123456",
+                onValueChange = { /* Preview only */ },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+// Preview for OtpInputField - Empty State
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, name = "OtpInputField - Empty")
+@Composable
+fun OtpInputFieldEmptyPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "OTP Input Field - Empty",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            OtpInputField(
+                value = "",
+                onValueChange = { /* Preview only */ },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+// Preview for OtpInputField - Error State
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, name = "OtpInputField - Error")
+@Composable
+fun OtpInputFieldErrorPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "OTP Input Field - Error State",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            OtpInputField(
+                value = "123",
+                onValueChange = { /* Preview only */ },
+                modifier = Modifier.fillMaxWidth(),
+                isError = true
+            )
+        }
+    }
+}
+
+// Preview for OtpInputWithAutofill
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun OtpInputWithAutofillPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "OTP Input with Autofill",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            OtpInputWithAutofill(
+                value = "123456",
+                onValueChange = { /* Preview only */ },
+                onOtpComplete = { /* Preview only */ },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+// Preview for OtpInputWithAutofill - Empty State
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, name = "OtpInputWithAutofill - Empty")
+@Composable
+fun OtpInputWithAutofillEmptyPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "OTP Input with Autofill - Empty",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            OtpInputWithAutofill(
+                value = "",
+                onValueChange = { /* Preview only */ },
+                onOtpComplete = { /* Preview only */ },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+// Preview for OtpInputWithSmsRetriever
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+fun OtpInputWithSmsRetrieverPreview() {
+    MaterialTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "OTP Input with SMS Retriever",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            
+            OtpInputWithSmsRetriever(
+                value = "123456",
+                onValueChange = { /* Preview only */ },
+                onOtpComplete = { /* Preview only */ },
+                detectedOtp = "123456",
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 } 
