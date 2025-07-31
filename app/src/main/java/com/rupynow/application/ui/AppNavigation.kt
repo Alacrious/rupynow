@@ -10,8 +10,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +46,8 @@ fun AppNavigation(
     generateOtp: (String, String, (Boolean) -> Unit, () -> Unit) -> Unit,
     context: Context
 ) {
+    // State to store Aadhaar number for OTP verification
+    var aadhaarNumber by remember { mutableStateOf("") }
     when {
         !allPermissionsGranted -> {
             LandingPage(
@@ -196,14 +200,35 @@ fun AppNavigation(
                 }
                 Screen.AadhaarVerification -> {
                     AadhaarVerificationScreen(
-                        onContinue = { aadhaarNumber ->
+                        onContinue = { aadhaarNum ->
                             val analyticsService = AnalyticsService.getInstance(context)
                             analyticsService.logFeatureUsage("aadhaar_verification", "completed")
-                            // Here you would typically make an API call to verify the Aadhaar number
-                            // For now, we'll navigate to success
-                            onNavigate(Screen.Success)
+                            // Store the Aadhaar number and navigate to OTP screen
+                            aadhaarNumber = aadhaarNum
+                            onNavigate(Screen.AadhaarOtp)
                         },
                         context = context
+                    )
+                }
+                Screen.AadhaarOtp -> {
+                    AadhaarOtpScreen(
+                        onOtpVerified = { otp, onResult ->
+                            val analyticsService = AnalyticsService.getInstance(context)
+                            analyticsService.logFeatureUsage("aadhaar_otp_verification", "completed")
+                            // Here you would typically make an API call to verify the Aadhaar OTP
+                            // For now, we'll simulate success and navigate to success
+                            CoroutineScope(Dispatchers.IO).launch {
+                                delay(1000) // Simulate API call
+                                withContext(Dispatchers.Main) {
+                                    analyticsService.logApiCall("aadhaar_otp_verification", "success")
+                                    onResult(true)
+                                    onNavigate(Screen.Success)
+                                }
+                            }
+                        },
+                        onBackPressed = { onNavigate(Screen.AadhaarVerification) },
+                        context = context,
+                        aadhaarNumber = aadhaarNumber
                     )
                 }
                 Screen.LoanProcessing -> {
@@ -317,6 +342,32 @@ fun AppNavigationUserInputPreview() {
         AppNavigation(
             allPermissionsGranted = true,
             currentScreen = Screen.UserInput,
+            onNavigate = { /* Preview only */ },
+            userEmail = userEmail,
+            userPhone = userPhone,
+            resetLoadingCallback = resetLoadingCallback,
+            requestPermissions = { /* Preview only */ },
+            getPhoneNumber = { "9876543210" },
+            getGoogleAccountEmail = { "user@example.com" },
+            verifyOtpWithApi = { _, _ -> /* Preview only */ },
+            generateOtp = { _, _, _, _ -> /* Preview only */ },
+            context = LocalContext.current
+        )
+    }
+}
+
+// Preview for AppNavigation - Aadhaar OTP screen
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, name = "AppNavigation - Aadhaar OTP")
+@Composable
+fun AppNavigationAadhaarOtpPreview() {
+    val userEmail = remember { mutableStateOf("user@example.com") }
+    val userPhone = remember { mutableStateOf("9876543210") }
+    val resetLoadingCallback = remember { mutableStateOf<(() -> Unit)?>(null) }
+    
+    MaterialTheme {
+        AppNavigation(
+            allPermissionsGranted = true,
+            currentScreen = Screen.AadhaarOtp,
             onNavigate = { /* Preview only */ },
             userEmail = userEmail,
             userPhone = userPhone,

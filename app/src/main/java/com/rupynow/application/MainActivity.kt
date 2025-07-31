@@ -47,6 +47,7 @@ sealed class Screen {
     object LoanOffer : Screen()
     object Kyc : Screen()
     object AadhaarVerification : Screen()
+    object AadhaarOtp : Screen()
     object LoanProcessing : Screen()
     object Success : Screen()
 }
