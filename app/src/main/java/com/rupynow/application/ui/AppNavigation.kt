@@ -195,6 +195,27 @@ fun AppNavigation(
                             analyticsService.logFeatureUsage("kyc_verification", "digilocker_started")
                             onNavigate(Screen.Success)
                         },
+                        onVerifyViaSelfie = {
+                            val analyticsService = AnalyticsService.getInstance(context)
+                            analyticsService.logFeatureUsage("kyc_verification", "selfie_started")
+                            onNavigate(Screen.SelfieKyc)
+                        },
+                        context = context
+                    )
+                }
+                Screen.SelfieKyc -> {
+                    SelfieKycScreen(
+                        onSuccess = {
+                            val analyticsService = AnalyticsService.getInstance(context)
+                            analyticsService.logFeatureUsage("selfie_kyc_completed", "success")
+                            onNavigate(Screen.Success)
+                        },
+                        onManualReview = {
+                            val analyticsService = AnalyticsService.getInstance(context)
+                            analyticsService.logFeatureUsage("selfie_kyc_manual_review", "requested")
+                            onNavigate(Screen.Success) // Navigate to support/manual review screen
+                        },
+                        onBackPressed = { onNavigate(Screen.Kyc) },
                         context = context
                     )
                 }
@@ -216,19 +237,49 @@ fun AppNavigation(
                             val analyticsService = AnalyticsService.getInstance(context)
                             analyticsService.logFeatureUsage("aadhaar_otp_verification", "completed")
                             // Here you would typically make an API call to verify the Aadhaar OTP
-                            // For now, we'll simulate success and navigate to success
+                            // For now, we'll simulate success and navigate to data confirmation
                             CoroutineScope(Dispatchers.IO).launch {
                                 delay(1000) // Simulate API call
                                 withContext(Dispatchers.Main) {
                                     analyticsService.logApiCall("aadhaar_otp_verification", "success")
                                     onResult(true)
-                                    onNavigate(Screen.Success)
+                                    onNavigate(Screen.AadhaarDataConfirmation)
                                 }
                             }
                         },
                         onBackPressed = { onNavigate(Screen.AadhaarVerification) },
                         context = context,
                         aadhaarNumber = aadhaarNumber
+                    )
+                }
+                Screen.AadhaarDataConfirmation -> {
+                    AadhaarDataConfirmationScreen(
+                        onConfirm = { aadhaarData, isAddressEdited ->
+                            val analyticsService = AnalyticsService.getInstance(context)
+                            analyticsService.logFeatureUsage("aadhaar_data_confirmation", "completed")
+                            
+                            if (isAddressEdited) {
+                                analyticsService.logFeatureUsage("address_edited", "true")
+                                // Here you would trigger address proof upload
+                                // For now, we'll navigate to success
+                            }
+                            
+                            CoroutineScope(Dispatchers.IO).launch {
+                                delay(1000) // Simulate API call
+                                withContext(Dispatchers.Main) {
+                                    analyticsService.logApiCall("aadhaar_data_confirmation", "success")
+                                    onNavigate(Screen.Success)
+                                }
+                            }
+                        },
+                        onBackPressed = { onNavigate(Screen.AadhaarOtp) },
+                        context = context,
+                        aadhaarData = AadhaarData(
+                            name = "John Doe", // This would come from Aadhaar API
+                            dateOfBirth = "15-03-1990",
+                            gender = "Male",
+                            address = "123 Main Street, Apartment 4B, New Delhi, Delhi 110001"
+                        )
                     )
                 }
                 Screen.LoanProcessing -> {

@@ -21,6 +21,7 @@ import com.rupynow.application.services.AnalyticsService
 fun KycScreen(
     onVerifyViaAadhaar: () -> Unit,
     onVerifyViaDigiLocker: () -> Unit,
+    onVerifyViaSelfie: () -> Unit,
     context: android.content.Context
 ) {
     Column(
@@ -163,6 +164,63 @@ fun KycScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Selfie KYC Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            onClick = {
+                val analyticsService = AnalyticsService.getInstance(context)
+                analyticsService.logButtonClick("verify_via_selfie", "kyc_screen")
+                onVerifyViaSelfie()
+            }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.CameraAlt,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "Selfie KYC",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "Take a selfie for instant identity verification",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Icon(
+                    imageVector = Icons.Filled.ChevronRight,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.weight(1f))
 
         // Info Text
@@ -185,6 +243,7 @@ fun KycScreenPreview() {
         KycScreen(
             onVerifyViaAadhaar = { /* Preview only */ },
             onVerifyViaDigiLocker = { /* Preview only */ },
+            onVerifyViaSelfie = { /* Preview only */ },
             context = LocalContext.current
         )
     }
