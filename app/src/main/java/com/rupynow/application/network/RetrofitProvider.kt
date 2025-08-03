@@ -26,4 +26,20 @@ object RetrofitProvider {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(AuthApi::class.java)
+        
+    // Bank Account API
+    val bankAccountApi: BankAccountApi = Retrofit.Builder()
+        .baseUrl("https://daf01b84975c.ngrok-free.app/")
+        .client(client)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(BankAccountApi::class.java)
+        
+    fun provideRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://daf01b84975c.ngrok-free.app/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 } 

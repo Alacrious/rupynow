@@ -50,6 +50,7 @@ sealed class Screen {
     object AadhaarOtp : Screen()
     object AadhaarDataConfirmation : Screen()
     object SelfieKyc : Screen()
+    object BankAccountVerification : Screen()
     object LoanProcessing : Screen()
     object Success : Screen()
 }

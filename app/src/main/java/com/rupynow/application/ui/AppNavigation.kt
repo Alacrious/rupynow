@@ -21,10 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rupynow.application.MainActivity
 import com.rupynow.application.Screen
 import com.rupynow.application.data.UserPreferences
 import com.rupynow.application.services.AnalyticsService
+import com.rupynow.application.ui.BankAccountVerificationViewModel
+import com.rupynow.application.ui.BankAccountVerificationViewModelFactory
+import com.rupynow.application.ui.BankAccountVerificationScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -208,7 +212,7 @@ fun AppNavigation(
                         onSuccess = {
                             val analyticsService = AnalyticsService.getInstance(context)
                             analyticsService.logFeatureUsage("selfie_kyc_completed", "success")
-                            onNavigate(Screen.Success)
+                            onNavigate(Screen.BankAccountVerification)
                         },
                         onManualReview = {
                             val analyticsService = AnalyticsService.getInstance(context)
@@ -268,7 +272,7 @@ fun AppNavigation(
                                 delay(1000) // Simulate API call
                                 withContext(Dispatchers.Main) {
                                     analyticsService.logApiCall("aadhaar_data_confirmation", "success")
-                                    onNavigate(Screen.Success)
+                                    onNavigate(Screen.BankAccountVerification)
                                 }
                             }
                         },
@@ -282,6 +286,22 @@ fun AppNavigation(
                         )
                     )
                 }
+                                 Screen.BankAccountVerification -> {
+                     val viewModelFactory = BankAccountVerificationViewModelFactory(context)
+                     val viewModel = viewModel<BankAccountVerificationViewModel>(
+                         factory = viewModelFactory
+                     )
+                     
+                     BankAccountVerificationScreen(
+                         viewModel = viewModel,
+                         onVerificationComplete = {
+                             val analyticsService = AnalyticsService.getInstance(context)
+                             analyticsService.logFeatureUsage("bank_account_verification", "completed")
+                             onNavigate(Screen.Success)
+                         },
+                         context = context
+                     )
+                 }
                 Screen.LoanProcessing -> {
                     // Loan application processing screen
                     Column(
