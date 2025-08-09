@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import com.rupynow.application.services.AnalyticsService
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 
 @Composable
 fun AadhaarOtpScreen(
@@ -90,7 +92,7 @@ fun AadhaarOtpScreen(
         
         // Title
         Text(
-            text = "Verify Your Aadhaar",
+            text = stringResource(R.string.verify_your_aadhaar),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -100,7 +102,7 @@ fun AadhaarOtpScreen(
         
         // Subtitle
         Text(
-            text = "We've sent a verification code to your registered mobile number linked with Aadhaar",
+            text = stringResource(R.string.aadhaar_otp_sent_message),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -132,13 +134,13 @@ fun AadhaarOtpScreen(
                     
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Aadhaar Number",
+                            text = stringResource(R.string.aadhaar_number),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         
                         Text(
-                            text = "XXXX XXXX ${aadhaarNumber.takeLast(4)}",
+                            text = stringResource(R.string.aadhaar_number_display, aadhaarNumber.takeLast(4)),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -162,8 +164,8 @@ fun AadhaarOtpScreen(
                     errorMessage = "" // Clear error when user types
                 }
             },
-            label = { Text("Enter 6-digit OTP") },
-            placeholder = { Text("123456") },
+            label = { Text(stringResource(R.string.enter_6_digit_otp)) },
+            placeholder = { Text(stringResource(R.string.otp_placeholder)) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -193,7 +195,7 @@ fun AadhaarOtpScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "Verifying Aadhaar OTP...",
+                    text = stringResource(R.string.verifying_aadhaar_otp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -238,7 +240,7 @@ fun AadhaarOtpScreen(
                 Spacer(modifier = Modifier.width(12.dp))
                 
                 Text(
-                    text = "This verification is secure and follows UIDAI guidelines. Please check your SMS inbox for the OTP sent by UIDAI to your registered mobile number.",
+                    text = stringResource(R.string.aadhaar_verification_info),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
@@ -274,7 +276,7 @@ fun AadhaarOtpScreen(
                 )
             } else {
                 Text(
-                    text = "Verify Aadhaar",
+                    text = stringResource(R.string.verify_aadhaar),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -292,7 +294,7 @@ fun AadhaarOtpScreen(
             }
         ) {
             Text(
-                text = "Didn't receive the code? Resend",
+                text = stringResource(R.string.didnt_receive_code),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

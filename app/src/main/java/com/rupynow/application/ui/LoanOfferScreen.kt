@@ -16,6 +16,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 import com.rupynow.application.services.AnalyticsService
 import kotlinx.coroutines.launch
 
@@ -51,7 +53,7 @@ fun LoanOfferScreen(
         // Celebration Icon
         Icon(
             imageVector = Icons.Filled.Celebration,
-            contentDescription = "Celebration",
+            contentDescription = stringResource(R.string.cd_celebration),
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.primary
         )
@@ -89,7 +91,7 @@ fun LoanOfferScreen(
                 modifier = Modifier.padding(20.dp)
             ) {
                 Text(
-                    text = "Loan amount",
+                    text = stringResource(R.string.loan_amount),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -118,7 +120,7 @@ fun LoanOfferScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "Loan amount",
+                    text = stringResource(R.string.loan_amount),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -139,7 +141,7 @@ fun LoanOfferScreen(
                 modifier = Modifier.padding(20.dp)
             ) {
                 Text(
-                    text = "Loan details",
+                    text = stringResource(R.string.loan_details),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -152,7 +154,7 @@ fun LoanOfferScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Interest rate",
+                        text = stringResource(R.string.interest_rate),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -171,7 +173,7 @@ fun LoanOfferScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Processing fee",
+                        text = stringResource(R.string.processing_fee),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -190,7 +192,7 @@ fun LoanOfferScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Tenure",
+                        text = stringResource(R.string.tenure),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -209,7 +211,7 @@ fun LoanOfferScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "EMI",
+                        text = stringResource(R.string.emi_amount),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -241,7 +243,7 @@ fun LoanOfferScreen(
             )
         ) {
             Text(
-                text = "Continue to Apply",
+                text = stringResource(R.string.apply_now),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )

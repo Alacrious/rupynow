@@ -18,6 +18,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rupynow.application.data.UserPreferences
@@ -53,7 +55,7 @@ fun BasicDetailsScreen(
         
         // Greeting
         Text(
-            text = "Hi $userName!",
+            text = stringResource(R.string.hi_user, userName),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Start,
@@ -64,7 +66,7 @@ fun BasicDetailsScreen(
         
         // Updated message for basic details
         Text(
-            text = "Just a few details to apply for loan. It takes less than 2 minutes.",
+            text = stringResource(R.string.basic_details_message),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Start,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -96,7 +98,7 @@ fun BasicDetailsScreen(
                 Spacer(modifier = Modifier.width(12.dp))
                 
                 Text(
-                    text = "Your data is encrypted & RBI-compliant",
+                    text = stringResource(R.string.data_encrypted_message),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -109,7 +111,7 @@ fun BasicDetailsScreen(
         OutlinedTextField(
             value = fullName,
             onValueChange = { fullName = it },
-            label = { Text("Full Name") },
+            label = { Text(stringResource(R.string.full_name)) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -124,7 +126,7 @@ fun BasicDetailsScreen(
         OutlinedTextField(
             value = panNumber,
             onValueChange = { panNumber = it.uppercase() },
-            label = { Text("PAN Number") },
+            label = { Text(stringResource(R.string.pan_number)) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,

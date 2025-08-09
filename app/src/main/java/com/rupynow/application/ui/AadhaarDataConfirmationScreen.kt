@@ -15,6 +15,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.rupynow.application.services.AnalyticsService
@@ -64,7 +66,7 @@ fun AadhaarDataConfirmationScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = "Aadhaar Verified",
+                    contentDescription = stringResource(R.string.cd_aadhaar_verification),
                     modifier = Modifier.size(40.dp),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -75,7 +77,7 @@ fun AadhaarDataConfirmationScreen(
         
         // Title
         Text(
-            text = "Aadhaar Data Retrieved",
+            text = stringResource(R.string.aadhaar_data_retrieved),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -85,7 +87,7 @@ fun AadhaarDataConfirmationScreen(
         
         // Subtitle
         Text(
-            text = "Please review and confirm your details from Aadhaar",
+            text = stringResource(R.string.review_confirm_aadhaar),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -104,7 +106,7 @@ fun AadhaarDataConfirmationScreen(
                 modifier = Modifier.padding(20.dp)
             ) {
                 Text(
-                    text = "Personal Information",
+                    text = stringResource(R.string.personal_information),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -116,7 +118,7 @@ fun AadhaarDataConfirmationScreen(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Full Name") },
+                    label = { Text(stringResource(R.string.full_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -131,7 +133,7 @@ fun AadhaarDataConfirmationScreen(
                 OutlinedTextField(
                     value = dateOfBirth,
                     onValueChange = { dateOfBirth = it },
-                    label = { Text("Date of Birth") },
+                    label = { Text(stringResource(R.string.date_of_birth)) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -146,7 +148,7 @@ fun AadhaarDataConfirmationScreen(
                 OutlinedTextField(
                     value = gender,
                     onValueChange = { gender = it },
-                    label = { Text("Gender") },
+                    label = { Text(stringResource(R.string.gender)) },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -174,7 +176,7 @@ fun AadhaarDataConfirmationScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Address Information",
+                        text = stringResource(R.string.address_information),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -183,7 +185,7 @@ fun AadhaarDataConfirmationScreen(
                     Spacer(modifier = Modifier.weight(1f))
                     
                     Text(
-                        text = "As per Aadhaar",
+                        text = stringResource(R.string.as_per_aadhaar),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -198,7 +200,7 @@ fun AadhaarDataConfirmationScreen(
                         address = it
                         isAddressEdited = true
                     },
-                    label = { Text("Current Address") },
+                    label = { Text(stringResource(R.string.current_address)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
                     maxLines = 5,
@@ -230,7 +232,7 @@ fun AadhaarDataConfirmationScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             
                             Text(
-                                text = "Address edited. You may need to upload address proof.",
+                                text = stringResource(R.string.address_edited_warning),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -267,7 +269,7 @@ fun AadhaarDataConfirmationScreen(
                 Spacer(modifier = Modifier.width(12.dp))
                 
                 Text(
-                    text = "Your personal information is read-only as it matches your Aadhaar. You can edit your address if it has changed since your Aadhaar was issued.",
+                    text = stringResource(R.string.personal_info_readonly),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
@@ -301,7 +303,7 @@ fun AadhaarDataConfirmationScreen(
                 )
             } else {
                 Text(
-                    text = "Confirm Details",
+                    text = stringResource(R.string.confirm_details),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -315,7 +317,7 @@ fun AadhaarDataConfirmationScreen(
             onClick = onBackPressed
         ) {
             Text(
-                text = "Go Back",
+                text = stringResource(R.string.go_back),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -334,14 +336,14 @@ fun AddressProofUploadDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Upload Address Proof",
+                text = stringResource(R.string.upload_address_proof),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Text(
-                text = "Since you've edited your address, please upload a recent address proof document (utility bill, rent agreement, etc.) to verify your current address.",
+                text = stringResource(R.string.address_proof_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
@@ -349,14 +351,14 @@ fun AddressProofUploadDialog(
             Button(
                 onClick = onUpload
             ) {
-                Text("Upload Document")
+                Text(stringResource(R.string.upload_document))
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

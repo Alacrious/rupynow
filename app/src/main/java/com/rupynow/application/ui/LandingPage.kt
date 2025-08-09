@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 
 @Composable
 fun LandingPage(onAcceptAll: () -> Unit) {
@@ -28,11 +30,11 @@ fun LandingPage(onAcceptAll: () -> Unit) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         // App Title
         Text(
-            text = "Welcome to RupyNow",
+            text = stringResource(R.string.welcome_to_rupynow),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -41,7 +43,7 @@ fun LandingPage(onAcceptAll: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "We need a few permissions to provide you with the best experience",
+            text = stringResource(R.string.permissions_required_message),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -72,7 +74,7 @@ fun LandingPage(onAcceptAll: () -> Unit) {
             icon = Icons.Filled.LocationOn
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(2f))
 
         // Accept All Button
         Button(

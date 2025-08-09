@@ -25,6 +25,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 import com.rupynow.application.MainActivity
 import com.rupynow.application.UserInputUiState
 
@@ -84,7 +86,7 @@ fun UserInputScreen(
 
         // App Title
         Text(
-            text = "Welcome to RupyNow",
+            text = stringResource(R.string.welcome_to_rupynow),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -93,7 +95,7 @@ fun UserInputScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Please enter your details to continue",
+            text = stringResource(R.string.please_enter_details),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -105,7 +107,7 @@ fun UserInputScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email Address") },
+            label = { Text(stringResource(R.string.email)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Filled.Email,
@@ -126,7 +128,7 @@ fun UserInputScreen(
         OutlinedTextField(
             value = phone,
             onValueChange = { phone = it },
-            label = { Text("Phone Number") },
+            label = { Text(stringResource(R.string.phone_number)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Filled.Phone,
@@ -163,7 +165,7 @@ fun UserInputScreen(
                     enabled = email.isNotBlank() && phone.isNotBlank()
                 ) {
                     Text(
-                        text = "Verify",
+                        text = stringResource(R.string.verify),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )

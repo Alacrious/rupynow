@@ -133,34 +133,58 @@ class MainActivity : ComponentActivity() {
             val userPhone = remember { mutableStateOf("") }
             val resetLoadingCallback = remember { mutableStateOf<(() -> Unit)?>(null) }
 
+            // Function to check user status and navigate accordingly
+            suspend fun checkUserStatusAndNavigate() {
+                Log.d("MainActivity", "Starting checkUserStatusAndNavigate...")
+                try {
+                    val userPreferences = UserPreferences(this@MainActivity)
+                    val existingUserId = userPreferences.userId.first()
+                    Log.d("MainActivity", "Retrieved existingUserId: ${existingUserId ?: "null"}")
+                    if (existingUserId != null && existingUserId.isNotBlank()) {
+                        Log.d("MainActivity", "Found existing userId: $existingUserId, navigating to basic details")
+                        val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                        analyticsService.logFeatureUsage("app_launch", "existing_user")
+                        
+                        // Start SMS sync immediately if userId exists
+                        startSmsSync()
+                        
+                        currentScreen.value = Screen.BasicDetails
+                        Log.d("MainActivity", "Navigation set to BasicDetails")
+                    } else {
+                        Log.d("MainActivity", "No existing userId found, starting from user input")
+                        val analyticsService = AnalyticsService.getInstance(this@MainActivity)
+                        analyticsService.logFeatureUsage("app_launch", "new_user")
+                        currentScreen.value = Screen.UserInput
+                        Log.d("MainActivity", "Navigation set to UserInput")
+                    }
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Error checking existing user: ${e.message}")
+                    currentScreen.value = Screen.UserInput
+                    Log.d("MainActivity", "Navigation set to UserInput due to error")
+                }
+            }
+
             // Check permissions and user status on app launch
             LaunchedEffect(Unit) {
                 if (allPermissionsGranted.value) {
-                    try {
-                        val userPreferences = UserPreferences(this@MainActivity)
-                        val existingUserId = userPreferences.userId.first()
-                        if (existingUserId != null && existingUserId.isNotBlank()) {
-                            Log.d("MainActivity", "Found existing userId: $existingUserId, navigating to basic details")
-                            val analyticsService = AnalyticsService.getInstance(this@MainActivity)
-                            analyticsService.logFeatureUsage("app_launch", "existing_user")
-                            
-                            // Start SMS sync immediately if userId exists
-                            startSmsSync()
-                            
-                            currentScreen.value = Screen.BasicDetails
-                        } else {
-                            Log.d("MainActivity", "No existing userId found, starting from user input")
-                            val analyticsService = AnalyticsService.getInstance(this@MainActivity)
-                            analyticsService.logFeatureUsage("app_launch", "new_user")
-                            currentScreen.value = Screen.UserInput
-                        }
-                    } catch (e: Exception) {
-                        Log.e("MainActivity", "Error checking existing user: ${e.message}")
-                        currentScreen.value = Screen.UserInput
-                    }
+                    // TEMPORARY: Always start with CheckingUser for test mode
+                    // TODO: Revert this after testing
+                    Log.d("MainActivity", "TEST MODE: Starting with CheckingUser screen")
+                    currentScreen.value = Screen.CheckingUser
                 } else {
                     Log.d("MainActivity", "Permissions missing, showing permission screen")
                     currentScreen.value = Screen.Permissions
+                }
+            }
+
+            // React to permission state changes
+            LaunchedEffect(allPermissionsGranted.value) {
+                Log.d("MainActivity", "Permission state changed to: ${allPermissionsGranted.value}")
+                if (allPermissionsGranted.value) {
+                    // TEMPORARY: Always start with CheckingUser for test mode
+                    // TODO: Revert this after testing
+                    Log.d("MainActivity", "TEST MODE: All permissions granted, starting with CheckingUser")
+                    currentScreen.value = Screen.CheckingUser
                 }
             }
 
@@ -171,7 +195,16 @@ class MainActivity : ComponentActivity() {
                 userEmail = userEmail,
                 userPhone = userPhone,
                 resetLoadingCallback = resetLoadingCallback,
-                requestPermissions = this@MainActivity::requestPermissions,
+                requestPermissions = { callback ->
+                    this@MainActivity.requestPermissions { granted ->
+                        if (granted) {
+                            Log.d("MainActivity", "Permissions granted, updating state...")
+                            // Update the permissions state
+                            allPermissionsGranted.value = true
+                        }
+                        callback(granted)
+                    }
+                },
                 getPhoneNumber = this@MainActivity::getPhoneNumber,
                 getGoogleAccountEmail = this@MainActivity::getGoogleAccountEmail,
                 verifyOtpWithApi = this@MainActivity::verifyOtpWithApi,

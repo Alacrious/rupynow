@@ -1,3 +1,234 @@
 <resources>
     <string name="app_name">RupyNow</string>
+    
+    <!-- Common UI Elements -->
+    <string name="back">Back</string>
+    <string name="btn_continue">Continue</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="verify">Verify</string>
+    <string name="submit">Submit</string>
+    <string name="proceed">Proceed</string>
+    <string name="loading">Loading…</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="failed">Failed</string>
+    <string name="timeout">Timeout</string>
+    <string name="test">TEST</string>
+    
+    <!-- Welcome & Landing -->
+    <string name="welcome_to_rupynow">Welcome to RupyNow</string>
+    <string name="permissions_required_message">We need a few permissions to provide you with the best experience</string>
+    <string name="please_enter_details">Please enter your details to continue</string>
+    <string name="hi_user">Hi %1$s!</string>
+    <string name="basic_details_message">Just a few details to apply for loan. It takes less than 2 minutes.</string>
+    <string name="data_encrypted_message">Your data is encrypted &amp; RBI-compliant</string>
+    
+    <!-- User Input Screen -->
+    <string name="full_name">Full Name</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="pan_number">PAN Number</string>
+    <string name="enter_valid_email">Please enter a valid email address</string>
+    <string name="enter_valid_phone">Please enter a valid phone number</string>
+    <string name="enter_valid_pan">Please enter a valid PAN number</string>
+    
+    <!-- OTP Verification -->
+    <string name="verify_your_number">Verify Your Number</string>
+    <string name="verify_your_aadhaar">Verify Your Aadhaar</string>
+    <string name="otp_sent_message">We\'ve sent a verification code to\n%1$s</string>
+    <string name="aadhaar_otp_sent_message">We\'ve sent a verification code to your registered mobile number linked with Aadhaar</string>
+    <string name="enter_6_digit_otp">Enter 6-digit OTP</string>
+    <string name="otp_placeholder">123456</string>
+    <string name="verifying_otp">Verifying OTP…</string>
+    <string name="verifying_aadhaar_otp">Verifying Aadhaar OTP…</string>
+    <string name="invalid_verification_code">Invalid verification code. Please try again.</string>
+    <string name="please_enter_valid_code">Please enter a valid verification code</string>
+    <string name="verify_code">Verify Code</string>
+    <string name="verify_aadhaar">Verify Aadhaar</string>
+    <string name="didnt_receive_code">Didn\'t receive the code? Resend</string>
+    <string name="otp_detected">OTP Detected!</string>
+    <string name="tap_to_autofill">Tap to auto-fill the verification code</string>
+    <string name="autofill">Auto-fill</string>
+    <string name="otp_auto_detect_info">We\'ll automatically detect and fill the OTP from SMS messages sent to your number.</string>
+    <string name="aadhaar_verification_info">This verification is secure and follows UIDAI guidelines. Please check your SMS inbox for the OTP sent by UIDAI to your registered mobile number.</string>
+    
+    <!-- Aadhaar Verification -->
+    <string name="verify_via_aadhaar">Verify via Aadhaar</string>
+    <string name="aadhaar_number">Aadhaar Number</string>
+    <string name="enter_aadhaar_instruction">Enter your Aadhaar number as per your Aadhaar card</string>
+    <string name="enter_aadhaar_field">Enter the Aadhaar number in this field</string>
+    <string name="i_agree_to_terms">I agree to the</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="aadhaar_number_display">XXXX XXXX %1$s</string>
+    
+    <!-- Aadhaar Data Confirmation -->
+    <string name="review_confirm_aadhaar">Please review and confirm your details from Aadhaar</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="address_information">Address Information</string>
+    <string name="as_per_aadhaar">As per Aadhaar</string>
+    <string name="current_address">Current Address</string>
+    <string name="address_edited_warning">Address edited. You may need to upload address proof.</string>
+    <string name="personal_info_readonly">Your personal information is read-only as it matches your Aadhaar. You can edit your address if it has changed since your Aadhaar was issued.</string>
+    <string name="confirm_details">Confirm Details</string>
+    <string name="go_back">Go Back</string>
+    <string name="upload_address_proof">Upload Address Proof</string>
+    <string name="address_proof_message">Since you\'ve edited your address, please upload a recent address proof document (utility bill, rent agreement, etc.) to verify your current address.</string>
+    <string name="upload_document">Upload Document</string>
+    
+    <!-- KYC Screen -->
+    <string name="complete_kyc">Complete KYC</string>
+    <string name="choose_verification_method">Choose your preferred verification method</string>
+    <string name="verify_via_digilocker">Verify via DigiLocker</string>
+    <string name="verify_via_selfie">Verify via Selfie</string>
+    
+    <!-- Selfie KYC -->
+    <string name="kyc_verification_test_mode">KYC Verification (TEST MODE)</string>
+    <string name="setting_up_camera">Setting up camera…</string>
+    <string name="face_alignment">Face Alignment</string>
+    <string name="liveness_check">Liveness Check</string>
+    <string name="capturing">Capturing…</string>
+    <string name="processing">Processing…</string>
+    <string name="verification_complete">Verification Complete</string>
+    <string name="verification_failed">Verification Failed</string>
+    <string name="camera_microphone_access_required">Camera &amp; Microphone Access Required</string>
+    <string name="camera_microphone_permission_message">We need access to your camera and microphone to perform the KYC verification. This includes:\n\n• Camera: To capture your photo for identity verification\n• Microphone: To perform liveness detection</string>
+    <string name="grant_permissions">Grant Permissions</string>
+    <string name="align_face_frame">Align your face in the frame</string>
+    <string name="say_code_screen">Say the code on screen</string>
+    <string name="say_code">Say the code:</string>
+    <string name="speak_clearly_microphone">Speak clearly into the microphone</string>
+               <string name="contact_support">Contact Support</string>
+           <string name="camera_permissions_required">Camera and microphone permissions are required for KYC verification</string>
+           <string name="camera_error">Camera Error</string>
+           <string name="demo_mode">Demo Mode</string>
+           <string name="camera_view_preview">Camera View Preview</string>
+                      <string name="liveness_check_preview">Liveness Check Preview</string>
+           <string name="aadhaar_data_retrieved">Aadhaar Data Retrieved</string>
+           <string name="date_of_birth">Date of Birth</string>
+           <string name="gender">Gender</string>
+
+           <string name="loan_details">Loan details</string>
+           <string name="cd_celebration">Celebration</string>
+           <string name="camera_unavailable">Camera is unavailable</string>
+    <string name="failed_initialize_camera">Failed to initialize camera: %1$s</string>
+    <string name="liveness_check_failed">Liveness check failed: %1$s</string>
+    <string name="recording_not_supported">Recording is not supported</string>
+    <string name="video_recording_failed">Video recording failed: %1$s</string>
+    <string name="failed_start_recording">Failed to start recording: %1$s</string>
+    <string name="failed_stop_recording">Failed to stop video recording: %1$s</string>
+    <string name="camera_binding_failed">Camera binding failed: %1$s</string>
+    <string name="camera_manager_not_initialized">Camera manager not initialized</string>
+    
+    <!-- Bank Account Verification -->
+    <string name="verify_your_bank_account">Verify Your Bank Account</string>
+    <string name="bank_verification_message">Verify your bank account to receive the loan</string>
+    <string name="send_rupee_message">Send ₹1 from the bank account you want the loan disbursed to.</string>
+    <string name="auto_fetch_verify_message">We will auto-fetch and verify your account details.</string>
+    <string name="start_verification">Start Verification</string>
+    <string name="initializing_verification">Initializing verification…</string>
+    <string name="please_send_rupee">Please send ₹1 to:</string>
+    <string name="copy_upi_handle">Copy UPI Handle</string>
+    <string name="share_upi_handle">Share UPI Handle</string>
+    <string name="send_rupee_using_upi">Send ₹1 Using UPI</string>
+    <string name="waiting_for_transfer">Waiting for ₹1 transfer…</string>
+    <string name="transfer_detection_message">Please complete the UPI transfer. We\'ll automatically detect it.</string>
+    <string name="account_details_verified">Account Details Verified</string>
+    <string name="account_holder">Account Holder</string>
+    <string name="account_number">Account Number</string>
+    <string name="ifsc_code">IFSC Code</string>
+    <string name="bank_name">Bank Name</string>
+    <string name="confirm_bank_details">I confirm the above bank details are correct and belong to me.</string>
+    <string name="confirm_proceed">Confirm &amp; Proceed</string>
+    <string name="bank_account_verified_success">Bank Account Verified Successfully!</string>
+    <string name="bank_ready_disbursal">Your bank account has been verified and is ready for loan disbursal.</string>
+    <string name="verification_timeout">Verification Timeout</string>
+    <string name="timeout_message">We couldn\'t verify your account. Please ensure you sent ₹1 from the correct UPI-linked account.</string>
+    <string name="send_rupee_to">Send ₹1 to: %1$s</string>
+    
+    <!-- Loan Offer Screen -->
+    <string name="congratulations">Congratulations!</string>
+    <string name="loan_approved_message">Your loan application has been approved!</string>
+    <string name="loan_amount">Loan Amount</string>
+    <string name="interest_rate">Interest Rate</string>
+    <string name="tenure">Tenure</string>
+    <string name="emi_amount">EMI Amount</string>
+    <string name="processing_fee">Processing Fee</string>
+    <string name="total_amount">Total Amount</string>
+    <string name="apply_now">Apply Now</string>
+    <string name="terms_loan">Terms &amp; Conditions apply</string>
+    
+    <!-- Error Messages -->
+    <string name="network_error">Network error occurred. Please check your connection and try again.</string>
+    <string name="permission_error">Permission denied. Please grant the required permissions to continue.</string>
+    <string name="verification_error">Verification failed. Please try again.</string>
+    <string name="unknown_error">An unknown error occurred. Please try again.</string>
+    <string name="liveness_error">Liveness check failed. Please try again.</string>
+    
+    <!-- Content Descriptions for Accessibility -->
+    <string name="cd_back_button">Back button</string>
+    <string name="cd_aadhaar_verification">Aadhaar Verification</string>
+    <string name="cd_camera_alt">Camera</string>
+    <string name="cd_check_circle">Success</string>
+    <string name="cd_error">Error</string>
+    <string name="cd_info">Information</string>
+    <string name="cd_security">Security</string>
+    <string name="cd_location">Location</string>
+    <string name="cd_phone">Phone</string>
+    <string name="cd_account_balance">Bank Account</string>
+    <string name="cd_content_copy">Copy</string>
+    <string name="cd_share">Share</string>
+    <string name="cd_payment">Payment</string>
+    <string name="cd_schedule">Schedule</string>
+    <string name="cd_support">Support</string>
+    <string name="cd_refresh">Refresh</string>
+    <string name="cd_auto_awesome">Auto-fill</string>
+    <string name="cd_credit_card">Credit Card</string>
+    <string name="cd_verified_user">Verified User</string>
+    <string name="cd_fingerprint">Fingerprint</string>
+    <string name="cd_arrow_back">Back</string>
+    
+    <!-- Notification Channels -->
+    <string name="notification_channel_main_name">RupyNow Notifications</string>
+    <string name="notification_channel_main_description">Main notifications for RupyNow app</string>
+    <string name="notification_channel_promotional_name">RupyNow Promotional</string>
+    <string name="notification_channel_promotional_description">Promotional notifications and offers</string>
+    <string name="notification_channel_transactional_name">RupyNow Transactional</string>
+    <string name="notification_channel_transactional_description">Transaction confirmations and updates</string>
+    
+    <!-- Analytics Events -->
+    <string name="analytics_app_open">app_open</string>
+    <string name="analytics_permission_granted">permission_granted</string>
+    <string name="analytics_permission_denied">permission_denied</string>
+    <string name="analytics_user_registration">user_registration</string>
+    <string name="analytics_button_click">button_click</string>
+    <string name="analytics_feature_usage">feature_usage</string>
+    <string name="analytics_conversion">conversion</string>
+    <string name="analytics_user_journey">user_journey</string>
+    <string name="analytics_session_start">session_start</string>
+    <string name="analytics_session_end">session_end</string>
+    <string name="analytics_app_error">app_error</string>
+    <string name="analytics_performance_metric">performance_metric</string>
+    
+    <!-- Analytics Parameters -->
+    <string name="analytics_permission_type">permission_type</string>
+    <string name="analytics_email_provided">email_provided</string>
+    <string name="analytics_phone_provided">phone_provided</string>
+    <string name="analytics_registration_complete">registration_complete</string>
+    <string name="analytics_button_name">button_name</string>
+    <string name="analytics_screen_name">screen_name</string>
+    <string name="analytics_error_type">error_type</string>
+    <string name="analytics_error_message">error_message</string>
+    <string name="analytics_feature_name">feature_name</string>
+    <string name="analytics_action">action</string>
+    <string name="analytics_conversion_type">conversion_type</string>
+    <string name="analytics_value">value</string>
+    <string name="analytics_currency">currency</string>
+    <string name="analytics_step">step</string>
+    <string name="analytics_step_number">step_number</string>
+    <string name="analytics_total_steps">total_steps</string>
+    <string name="analytics_metric_name">metric_name</string>
+    <string name="analytics_duration_seconds">duration_seconds</string>
+    <string name="analytics_timestamp">timestamp</string>
 </resources>

@@ -18,6 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 import com.rupynow.application.data.BankAccountVerificationState
 import com.rupynow.application.data.BankAccountDetailsData
 import com.rupynow.application.services.AnalyticsService
@@ -54,7 +56,7 @@ fun BankAccountVerificationScreen(
         
         // Header
         Text(
-            text = "Verify Your Bank Account",
+            text = stringResource(R.string.verify_your_bank_account),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -63,7 +65,7 @@ fun BankAccountVerificationScreen(
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Verify your bank account to receive the loan",
+            text = stringResource(R.string.bank_verification_message),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -181,7 +183,7 @@ private fun InitialStateContent(
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "Send ₹1 from the bank account you want the loan disbursed to.",
+                text = stringResource(R.string.send_rupee_message),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
@@ -189,7 +191,7 @@ private fun InitialStateContent(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "We will auto-fetch and verify your account details.",
+                text = stringResource(R.string.auto_fetch_verify_message),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -201,7 +203,7 @@ private fun InitialStateContent(
                 onClick = onStartVerification,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Start Verification")
+                Text(stringResource(R.string.start_verification))
             }
         }
     }
@@ -221,7 +223,7 @@ private fun LoadingStateContent() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Initializing verification...",
+            text = stringResource(R.string.initializing_verification),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
@@ -250,7 +252,7 @@ private fun UpiReadyStateContent(
                 modifier = Modifier.padding(20.dp)
             ) {
                 Text(
-                    text = "Please send ₹1 to:",
+                    text = stringResource(R.string.please_send_rupee),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )
@@ -272,17 +274,17 @@ private fun UpiReadyStateContent(
                     
                     Row {
                         IconButton(onClick = onCopyUpiHandle) {
-                            Icon(
-                                imageVector = Icons.Filled.ContentCopy,
-                                contentDescription = "Copy UPI Handle"
-                            )
+                                                    Icon(
+                            imageVector = Icons.Filled.ContentCopy,
+                            contentDescription = stringResource(R.string.cd_content_copy)
+                        )
                         }
                         
                         IconButton(onClick = onShareUpiHandle) {
-                            Icon(
-                                imageVector = Icons.Filled.Share,
-                                contentDescription = "Share UPI Handle"
-                            )
+                                                    Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = stringResource(R.string.cd_share)
+                        )
                         }
                     }
                 }
@@ -299,7 +301,7 @@ private fun UpiReadyStateContent(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Send ₹1 Using UPI")
+                    Text(stringResource(R.string.send_rupee_using_upi))
                 }
             }
         }
@@ -320,7 +322,7 @@ private fun WaitingForTransferContent() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Waiting for ₹1 transfer...",
+            text = stringResource(R.string.waiting_for_transfer),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
@@ -328,7 +330,7 @@ private fun WaitingForTransferContent() {
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Please complete the UPI transfer. We'll automatically detect it.",
+            text = stringResource(R.string.transfer_detection_message),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -370,7 +372,7 @@ private fun AccountDetailsContent(
                     Spacer(modifier = Modifier.width(8.dp))
                     
                     Text(
-                        text = "Account Details Verified",
+                        text = stringResource(R.string.account_details_verified),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -401,7 +403,7 @@ private fun AccountDetailsContent(
             Spacer(modifier = Modifier.width(8.dp))
             
             Text(
-                text = "I confirm the above bank details are correct and belong to me.",
+                text = stringResource(R.string.confirm_bank_details),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
             )
@@ -415,7 +417,7 @@ private fun AccountDetailsContent(
             enabled = isConfirmChecked,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Confirm & Proceed")
+            Text(stringResource(R.string.confirm_proceed))
         }
     }
 }
@@ -461,7 +463,7 @@ private fun ConfirmedStateContent() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Bank Account Verified Successfully!",
+            text = stringResource(R.string.bank_account_verified_success),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -470,7 +472,7 @@ private fun ConfirmedStateContent() {
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Your bank account has been verified and is ready for loan disbursal.",
+            text = stringResource(R.string.bank_ready_disbursal),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -497,7 +499,7 @@ private fun ErrorStateContent(
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Verification Failed",
+            text = stringResource(R.string.verification_failed),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -518,7 +520,7 @@ private fun ErrorStateContent(
             onClick = onRetry,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Retry")
+            Text(stringResource(R.string.retry))
         }
     }
 }
@@ -541,7 +543,7 @@ private fun TimeoutStateContent(
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "Verification Timeout",
+            text = stringResource(R.string.verification_timeout),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -550,7 +552,7 @@ private fun TimeoutStateContent(
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "We couldn't verify your account. Please ensure you sent ₹1 from the correct UPI-linked account.",
+            text = stringResource(R.string.timeout_message),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -562,7 +564,7 @@ private fun TimeoutStateContent(
             onClick = onRetry,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Retry")
+            Text(stringResource(R.string.retry))
         }
     }
 }

@@ -14,6 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 import androidx.compose.ui.unit.sp
 import com.rupynow.application.services.AnalyticsService
 
@@ -35,7 +37,7 @@ fun KycScreen(
 
         // Header
         Text(
-            text = "Complete KYC",
+            text = stringResource(R.string.complete_kyc),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -44,7 +46,7 @@ fun KycScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Choose your preferred verification method",
+            text = stringResource(R.string.choose_verification_method),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant

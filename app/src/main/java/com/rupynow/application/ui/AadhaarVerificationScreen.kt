@@ -18,6 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 import android.content.Context
 import androidx.compose.material.icons.filled.Fingerprint
 
@@ -64,7 +66,7 @@ fun AadhaarVerificationScreen(
 
         // Header with title only
         Text(
-            text = "Verify via Aadhaar",
+            text = stringResource(R.string.verify_via_aadhaar),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth(),
@@ -75,7 +77,7 @@ fun AadhaarVerificationScreen(
 
         // Instructional text
         Text(
-            text = "Enter your Aadhaar number as per your Aadhaar card",
+            text = stringResource(R.string.enter_aadhaar_instruction),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -89,7 +91,7 @@ fun AadhaarVerificationScreen(
                 aadhaarNumber = it.filter { char -> char.isDigit() }
                 isAadhaarValid = true
             },
-            label = { Text("Aadhaar Number") },
+            label = { Text(stringResource(R.string.aadhaar_number)) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -103,7 +105,7 @@ fun AadhaarVerificationScreen(
 
         // Helper text
         Text(
-            text = "Enter the Aadhaar number in this field",
+            text = stringResource(R.string.enter_aadhaar_field),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -123,12 +125,12 @@ fun AadhaarVerificationScreen(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = "I agree to the ",
+                text = stringResource(R.string.i_agree_to_terms),
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Text(
-                text = "Terms and Conditions",
+                text = stringResource(R.string.terms_and_conditions),
                 style = MaterialTheme.typography.bodyMedium,
                 textDecoration = TextDecoration.Underline,
                 color = MaterialTheme.colorScheme.primary
@@ -156,7 +158,7 @@ fun AadhaarVerificationScreen(
             enabled = aadhaarNumber.length == 12 && isTermsAccepted
         ) {
             Text(
-                text = "Continue",
+                text = stringResource(R.string.btn_continue),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )

@@ -22,6 +22,8 @@ import com.rupynow.application.services.AnalyticsService
 import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
+import com.rupynow.application.R
 
 @Composable
 fun OtpInputScreen(
@@ -131,7 +133,7 @@ fun OtpInputScreen(
         
         // Title
         Text(
-            text = "Verify Your Number",
+            text = stringResource(R.string.verify_your_number),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -141,7 +143,7 @@ fun OtpInputScreen(
         
         // Subtitle
         Text(
-            text = "We've sent a verification code to\n$phoneNumber",
+            text = stringResource(R.string.otp_sent_message, phoneNumber),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -173,14 +175,14 @@ fun OtpInputScreen(
                     
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "OTP Detected!",
+                            text = stringResource(R.string.otp_detected),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         
                         Text(
-                            text = "Tap to auto-fill the verification code",
+                            text = stringResource(R.string.tap_to_autofill),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -202,7 +204,7 @@ fun OtpInputScreen(
                         }
                     ) {
                         Text(
-                            text = "Auto-fill",
+                            text = stringResource(R.string.autofill),
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
@@ -261,7 +263,7 @@ fun OtpInputScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "Verifying OTP...",
+                    text = stringResource(R.string.verifying_otp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -306,7 +308,7 @@ fun OtpInputScreen(
                 Spacer(modifier = Modifier.width(12.dp))
                 
                 Text(
-                    text = "We'll automatically detect and fill the OTP from SMS messages sent to your number.",
+                    text = stringResource(R.string.otp_auto_detect_info),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
@@ -342,7 +344,7 @@ fun OtpInputScreen(
                 )
             } else {
                 Text(
-                    text = "Verify Code",
+                    text = stringResource(R.string.verify_code),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -360,7 +362,7 @@ fun OtpInputScreen(
             }
         ) {
             Text(
-                text = "Didn't receive the code? Resend",
+                text = stringResource(R.string.didnt_receive_code),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

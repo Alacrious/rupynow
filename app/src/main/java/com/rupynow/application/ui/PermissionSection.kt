@@ -33,7 +33,7 @@ fun PermissionSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(5.dp),
             verticalAlignment = Alignment.Top
         ) {
             Icon(
@@ -55,13 +55,13 @@ fun PermissionSection(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(1.dp))
 
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 20.sp
+                    lineHeight = 12.sp
                 )
             }
         }
